@@ -15,7 +15,7 @@
  
 #define BUFLEN 512
 #define NPACK 10
-#define PORT 9930
+#define PORT 3030
  
 // A small struct to hold a UDP endpoint. We'll use this to hold each client's endpoint.
 struct client
