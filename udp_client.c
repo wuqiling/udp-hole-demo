@@ -15,10 +15,10 @@
  
 #define BUFLEN 512
 #define NPACK 10
-#define PORT 9930
+#define PORT 3030
  
 // This is our server's IP address. In case you're wondering, this one is an RFC 5737 address.
-#define SRV_IP "203.0.113.61"
+#define SRV_IP "119.23.42.146"
  
 // A small struct to hold a UDP endpoint. We'll use this to hold each peer's endpoint.
 struct client
