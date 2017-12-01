@@ -3,7 +3,7 @@
 // By Oscar Rodriguez
 // This code is public domain, but you're a complete lunatic
 // if you plan to use this code in any real program.
- 
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -12,65 +12,65 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
- 
+
 #define BUFLEN 512
 #define NPACK 10
 #define PORT 3030
- 
+
 // This is our server's IP address. In case you're wondering, this one is an RFC 5737 address.
 #define SRV_IP "119.23.42.146"
- 
+
 // A small struct to hold a UDP endpoint. We'll use this to hold each peer's endpoint.
 struct client
 {
     int host;
     short port;
 };
- 
+
 // Just a function to kill the program when something goes wrong.
 void diep(char *s)
 {
     perror(s);
     exit(1);
 }
- 
-int main(int argc, char* argv[])
+
+int main(int argc, char *argv[])
 {
     struct sockaddr_in si_me, si_other;
-    int s, i, f, j, k, slen=sizeof(si_other);
+    int s, i, f, j, k, slen = sizeof(si_other);
     struct client buf;
     struct client server;
     struct client peers[10]; // 10 peers. Notice that we're not doing any bound checking.
     int n = 0;
- 
-    if ((s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))==-1)
+
+    if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
         diep("socket");
- 
+
     // Our own endpoint data
-    memset((char *) &si_me, 0, sizeof(si_me));
+    memset((char *)&si_me, 0, sizeof(si_me));
     si_me.sin_family = AF_INET;
     si_me.sin_port = htons(PORT); // This is not really necessary, we can also use 0 (any port)
     si_me.sin_addr.s_addr = htonl(INADDR_ANY);
- 
+
     // The server's endpoint data
-    memset((char *) &si_other, 0, sizeof(si_other));
+    memset((char *)&si_other, 0, sizeof(si_other));
     si_other.sin_family = AF_INET;
     si_other.sin_port = htons(PORT);
-    if (inet_aton(SRV_IP, &si_other.sin_addr)==0)
+    if (inet_aton(SRV_IP, &si_other.sin_addr) == 0)
         diep("aton");
- 
+
     // Store the server's endpoint data so we can easily discriminate between server and peer datagrams.
     server.host = si_other.sin_addr.s_addr;
     server.port = si_other.sin_port;
- 
+
     // Send a simple datagram to the server to let it know of our public UDP endpoint.
     // Not only the server, but other clients will send their data through this endpoint.
     // The datagram payload is irrelevant, but if we wanted to support multiple
     // clients behind the same NAT, we'd send our won private UDP endpoint information
     // as well.
-    if (sendto(s, "hi", 2, 0, (struct sockaddr*)(&si_other), slen)==-1)
+    if (sendto(s, "hi", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
         diep("sendto");
- 
+
     // Right here, our NAT should have a session entry between our host and the server.
     // We can only hope our NAT maps the same public endpoint (both host and port) when we
     // send datagrams to other clients using our same private endpoint.
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
         // peer communications. We discriminate by using the remote host endpoint data, but
         // remember that IP addresses are easily spoofed (actually, that's what the NAT is
         // doing), so remember to do some kind of validation in here.
-        if (recvfrom(s, &buf, sizeof(buf), 0, (struct sockaddr*)(&si_other), &slen)==-1)
+        if (recvfrom(s, &buf, sizeof(buf), 0, (struct sockaddr *)(&si_other), &slen) == -1)
             diep("recvfrom");
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
         if (server.host == si_other.sin_addr.s_addr && server.port == (short)(si_other.sin_port))
@@ -132,7 +132,8 @@ int main(int argc, char* argv[])
                     si_other.sin_port = peers[i].port;
                     // Once again, the payload is irrelevant. Feel free to send your VoIP
                     // data in here.
-                    if (sendto(s, "hi", 2, 0, (struct sockaddr*)(&si_other), slen)==-1)
+                    printf("#%d send data to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+                    if (sendto(s, "hi", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
                         diep("sendto()");
                 }
             }
@@ -150,7 +151,7 @@ int main(int argc, char* argv[])
                     break;
                 }
             }
- 
+
             // It is possible to get data from an unregistered peer. These are some reasons
             // I quickly came up with, in which this can happen:
             // 1. The server's datagram notifying us with the peer's address got lost,
@@ -166,7 +167,7 @@ int main(int argc, char* argv[])
             //    directly between both peers.
         }
     }
- 
+
     // Actually, we never reach this point...
     close(s);
     return 0;
