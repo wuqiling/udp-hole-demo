@@ -114,7 +114,7 @@ int udp_punch()
             // endpoint data. We're receiving binary data here, sent using the server's
             // byte ordering. We should make sure we agree on the endianness in any
             // serious code.
-            printf("The datagram came from the server.\n");
+            printf("\nThe datagram came from the server.\n");
             f = 0;
             // Now we just have to add the reported peer into our peer list
             memset((char *)&buf, 0, sizeof(struct client));
@@ -194,7 +194,7 @@ int udp_punch()
         else
         {
             // The datagram came from a peer
-            printf("The datagram came from a peer.\n");
+            printf("\nThe datagram came from a peer.\n");
             for (i = 0; i < n; i++)
             {
                 // Identify which peer it came from
