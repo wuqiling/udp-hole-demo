@@ -409,6 +409,7 @@ int main(int argc, char **argv)
 {
     //step 1
     //使用stun 获得当前网络 NAT 映射公网地址
+    printf("step 1. 使用stun 获得当前网络 NAT 映射公网地址\n");
     if (0 != getMyMappedAddr((int *)&mappedIp, (int *)&mappedPort))
     {
         printf("getMyMappedAddr failed\n");
@@ -417,36 +418,42 @@ int main(int argc, char **argv)
 
     //step 2
     //使用 udp + 外网 主机 获得要通信的远端主机 映射ip
+    printf("step 2. 使用 udp + 外网 主机 获得要通信的远端主机 映射ip\n");
     udp_punch();
 
     //step 3
-    //send data over rtp
-#if 0
-    //recv
-    udpRecv_settingInit("0.0.0.0", 3030);
-    if (udpRecv_init() < 0)
+    //send &recv data over rtp
+    if (argc == 2 && strcmp(argv[1], "recv") == 0)
     {
-        printf("udpRecv_init err\n");
-        return -1;
+        //recv
+        printf("step 3. recv data over rtp\n");
+        udpRecv_settingInit("0.0.0.0", 3030);
+        if (udpRecv_init() < 0)
+        {
+            printf("udpRecv_init err\n");
+            return -1;
+        }
+        if (0 > udpOrtp_recv())
+        {
+            printf("udpOrtp_send err\n");
+            return -1;
+        }
+        udpRecv_exit();
     }
-    if (0 > udpOrtp_recv())
+    else
     {
-        printf("udpOrtp_send err\n");
-        return -1;
+        //send
+        printf("step 3. send data over rtp\n");
+        struct in_addr inp;
+        inp.s_addr = peers[0].host;
+        udpSend_settingInit(inet_ntoa(inp), ntohs(peers[0].host));
+        if (udpSend_init() < 0)
+        {
+            printf("udpSend_init err\n");
+            return -1;
+        }
+        udpOrtp_send();
+        udpSend_exit();
     }
-    udpRecv_exit();
-#else
-    //send
-    struct in_addr inp;
-    inp.s_addr = peers[0].host;
-    udpSend_settingInit(inet_ntoa(inp), ntohs(peers[0].host));
-    if (udpSend_init() < 0)
-    {
-        printf("udpSend_init err\n");
-        return -1;
-    }
-    udpOrtp_send();
-    udpSend_exit();
-#endif
     return 0;
 }
