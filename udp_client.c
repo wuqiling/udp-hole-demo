@@ -137,7 +137,7 @@ int udp_punch()
                         struct in_addr inp;
                         inp.s_addr = buf.host;
                         printf("udp get own ip %s:%d\n", inet_ntoa(inp), ntohs(buf.port));
-                        continue;
+                        // continue;
                     }
                     peers[n].host = buf.host;
                     peers[n].port = buf.port;
