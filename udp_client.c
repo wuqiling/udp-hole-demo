@@ -13,12 +13,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "udp_send.h"
+#include "udp_recv.h"
+#include "STUN_client.h"
+
 #define BUFLEN 512
 #define NPACK 10
 #define PORT 3030
+#define PEER_LEN 3
 
 // This is our server's IP address. In case you're wondering, this one is an RFC 5737 address.
 #define SRV_IP "119.23.42.146"
+
+//use for test only
+#define LOCAL_IP "111.230.243.211"
 
 // A small struct to hold a UDP endpoint. We'll use this to hold each peer's endpoint.
 struct client
@@ -34,13 +42,20 @@ void diep(char *s)
     exit(1);
 }
 
-int main(int argc, char *argv[])
+//stun
+static volatile int endPoint_valid = 0;
+static volatile int mappedIp = 0;
+static volatile int mappedPort = 0;
+
+//udp punch
+static struct client peers[PEER_LEN]; // 10 peers. Notice that we're not doing any bound checking.
+
+int udp_punch()
 {
     struct sockaddr_in si_me, si_other;
     int s, i, f, j, k, slen = sizeof(si_other);
     struct client buf;
     struct client server;
-    struct client peers[10]; // 10 peers. Notice that we're not doing any bound checking.
     int n = 0;
 
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
@@ -63,6 +78,13 @@ int main(int argc, char *argv[])
     server.host = si_other.sin_addr.s_addr;
     server.port = si_other.sin_port;
 
+#define UDP_PUNCH_RECV_BUFF (10 << 10)
+    char *recvBuf = (char *)malloc(sizeof(char) * UDP_PUNCH_RECV_BUFF);
+    if (recvBuf == NULL)
+    {
+        diep("recvBuf malloc");
+    }
+
     // Send a simple datagram to the server to let it know of our public UDP endpoint.
     // Not only the server, but other clients will send their data through this endpoint.
     // The datagram payload is irrelevant, but if we wanted to support multiple
@@ -80,7 +102,9 @@ int main(int argc, char *argv[])
         // peer communications. We discriminate by using the remote host endpoint data, but
         // remember that IP addresses are easily spoofed (actually, that's what the NAT is
         // doing), so remember to do some kind of validation in here.
-        if (recvfrom(s, &buf, sizeof(buf), 0, (struct sockaddr *)(&si_other), &slen) == -1)
+        memset(recvBuf, 0, UDP_PUNCH_RECV_BUFF);
+        int ret = 0;
+        if ((ret = recvfrom(s, recvBuf, UDP_PUNCH_RECV_BUFF, 0, (struct sockaddr *)(&si_other), &slen)) == -1)
             diep("recvfrom");
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
         if (server.host == si_other.sin_addr.s_addr && server.port == (short)(si_other.sin_port))
@@ -92,6 +116,8 @@ int main(int argc, char *argv[])
             // serious code.
             f = 0;
             // Now we just have to add the reported peer into our peer list
+            memset((char *)&buf, 0, sizeof(struct client));
+            memcpy((char *)&buf, recvBuf, sizeof(struct client));
             for (i = 0; i < n && f == 0; i++)
             {
                 if (peers[i].host == buf.host && peers[i].port == buf.port)
@@ -100,16 +126,33 @@ int main(int argc, char *argv[])
                 }
             }
             // Only add it if we didn't have it before.
-            if (f == 0)
+            if (n + 1 < PEER_LEN)
             {
-                peers[n].host = buf.host;
-                peers[n].port = buf.port;
-                n++;
+                if (f == 0)
+                {
+                    if (mappedIp == buf.host)
+                    {
+                        //my own ip from server
+                        struct in_addr inp;
+                        inp.s_addr = buf.host;
+                        printf("udp get own ip %s:%d\n", inet_ntoa(inp), ntohs(buf.port));
+                        continue;
+                    }
+                    peers[n].host = buf.host;
+                    peers[n].port = buf.port;
+                    n++;
+
+                    si_other.sin_addr.s_addr = buf.host;
+                    si_other.sin_port = buf.port;
+                    printf("Added peer %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+                    printf("Now we have %d peers\n", n);
+                }
             }
-            si_other.sin_addr.s_addr = buf.host;
-            si_other.sin_port = buf.port;
-            printf("Added peer %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-            printf("Now we have %d peers\n", n);
+            else
+            {
+                printf("peer_len max %d !!!\n", n);
+                continue; //ignore the new peer
+            }
             // And here is where the actual hole punching happens. We are going to send
             // a bunch of datagrams to each peer. Since we're using the same socket we
             // previously used to send data to the server, our local endpoint is the same
@@ -132,9 +175,17 @@ int main(int argc, char *argv[])
                     si_other.sin_port = peers[i].port;
                     // Once again, the payload is irrelevant. Feel free to send your VoIP
                     // data in here.
-                    printf("#%d send data to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-                    if (sendto(s, "hi", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
-                        diep("sendto()");
+                    printf("#%2d send data to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+                    if (k == 9)
+                    {
+                        if (sendto(s, "ok", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
+                            diep("sendto()");
+                    }
+                    else
+                    {
+                        if (sendto(s, "hi", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
+                            diep("sendto()");
+                    }
                 }
             }
         }
@@ -150,6 +201,13 @@ int main(int argc, char *argv[])
                     printf("Received from peer %d!\n", i);
                     break;
                 }
+            }
+
+            if (recvBuf[0] == 'o' && recvBuf[1] == 'k')
+            {
+                printf("get ok responce !!!\n");
+                endPoint_valid = 1;
+                break; //退出循环准备收发数据
             }
 
             // It is possible to get data from an unregistered peer. These are some reasons
@@ -170,5 +228,225 @@ int main(int argc, char *argv[])
 
     // Actually, we never reach this point...
     close(s);
+    return 0;
+}
+
+//使用 stun 获得本机 NAT ip
+int getMyMappedAddr(int *mappedIp, int *mappedPort)
+{
+    struct STUNServer servers[14] = {
+        {"stun1.l.google.com", 19302},
+        {"stun1.l.google.com", 19305},
+        {"stun2.l.google.com", 19302},
+        {"stun2.l.google.com", 19305},
+        {"stun3.l.google.com", 19302},
+        {"stun3.l.google.com", 19305},
+        {"stun4.l.google.com", 19302},
+        {"stun4.l.google.com", 19305},
+        {"stun.l.google.com", 19302},
+        {"stun.l.google.com", 19305},
+        {"stun.wtfismyip.com", 3478},
+        {"stun.bcs2005.net", 3478},
+        {"numb.viagenie.ca", 3478},
+        {"173.194.202.127", 19302}};
+
+    int Success = 0;
+    char *address = malloc(sizeof(char) * 100);
+    if (address == NULL)
+    {
+        printf("address malloc err\n");
+        return -1;
+    }
+    int port = 0;
+    for (int index = 0; index < 14 && Success == 0; index++)
+    {
+        bzero(address, 100);
+        port = 0;
+
+        struct STUNServer server = servers[index];
+
+        int retVal = getPublicIPAddress(server, address, &port);
+
+        if (retVal != 0)
+        {
+            printf("%s: Failed. Error: %d\n", server.address, retVal);
+        }
+        else
+        {
+            printf("%s: Public IP: %s : %d\n", server.address, address, port);
+            Success = 1;
+        }
+    }
+    if (Success == 1)
+    {
+        struct in_addr inp;
+        inet_aton(address, &inp);
+        //TODO: 获得 ip 端口后，进行打洞数据传输, 两个客户端配合公网服务器获得对方ip(之后用 sip 服务器 取代该方式)
+        *mappedIp = inp.s_addr;
+        *mappedPort = port;
+        free(address);
+        return 0;
+    }
+    free(address);
+    return -1;
+}
+
+FILE *fp = NULL;
+char fpname[128] = "testSend.data";
+FILE *fpFormat = NULL;
+char fpFormaName[128] = "testSendForamt.data";
+/**
+ * 发送数据到映射的端口
+ */
+static int udpOrtp_send()
+{
+    if (NULL == (fp = fopen(fpname, "rb")))
+    {
+        printf("fopen %s err\n", fpname);
+        return -1;
+    }
+    if (NULL == (fpFormat = fopen(fpFormaName, "rb")))
+    {
+        printf("fopen %s err\n", fpFormaName);
+        return -1;
+    }
+    int len = 0;
+    int bufsize = (10 << 10);
+    char *buf = (char *)malloc(bufsize);
+    if (NULL == buf)
+    {
+        printf("err in malloc\n");
+        return -1;
+    }
+    while (1)
+    {
+        if (0 == fscanf(fpFormat, "%d", &len))
+        {
+            printf("read end or err\n");
+            break;
+        }
+        memset(buf, 0, bufsize);
+        if (len > bufsize || len != fread(buf, 1, len, fp)) //读取编码的声音
+        {
+            printf("read end or err\n");
+            break;
+        }
+        if (0 > udpSend_send(buf, len))
+        {
+            printf("rtp_sendAudio err\n");
+            fclose(fp);
+            fclose(fpFormat);
+            free(buf);
+            return -1;
+        }
+    }
+    fclose(fp);
+    fclose(fpFormat);
+    fp = NULL;
+    fpFormat = NULL;
+    if (buf != NULL)
+    {
+        free(buf);
+        buf = NULL;
+    }
+    return 0;
+}
+
+FILE *fp_recv = NULL;
+char fpname_recv[128] = "testRecv.data";
+FILE *fpFormat_recv = NULL;
+char fpFormaName_recv[128] = "testRecvForamt.data";
+/**
+ * 发送数据到映射的端口
+ */
+static int udpOrtp_recv()
+{
+    if (NULL == (fp_recv = fopen(fpname_recv, "wb")))
+    {
+        printf("fopen %s err\n", fpname_recv);
+        return -1;
+    }
+    if (NULL == (fpFormat_recv = fopen(fpFormaName_recv, "wb")))
+    {
+        printf("fopen %s err\n", fpFormaName_recv);
+        return -1;
+    }
+    int len = 0;
+    int bufsize = (10 << 10);
+    unsigned char *buf = (unsigned char *)malloc(bufsize);
+    if (NULL == buf)
+    {
+        printf("err in malloc\n");
+        return -1;
+    }
+    while (1)
+    {
+        if (udpRecv_recv(buf, &len) < 0)
+        {
+            printf("rtp_sendAudio err\n");
+            fclose(fp);
+            fclose(fpFormat);
+            free(buf);
+            return -1;
+        }
+        printf("recv data len %d\n", len);
+        //TODO: write to file
+    }
+    fclose(fp_recv);
+    fclose(fpFormat_recv);
+    fp_recv = NULL;
+    fpFormat_recv = NULL;
+    if (buf != NULL)
+    {
+        free(buf);
+        buf = NULL;
+    }
+    return 0;
+}
+
+//test udp punch and rtp send
+int main(int argc, char **argv)
+{
+    //step 1
+    //使用stun 获得当前网络 NAT 映射公网地址
+    if (0 != getMyMappedAddr((int *)&mappedIp, (int *)&mappedPort))
+    {
+        printf("getMyMappedAddr failed\n");
+        return -1;
+    }
+
+    //step 2
+    //使用 udp + 外网 主机 获得要通信的远端主机 映射ip
+    udp_punch();
+
+    //step 3
+    //send data over rtp
+#if 0
+    //recv
+    udpRecv_settingInit("0.0.0.0", 3030);
+    if (udpRecv_init() < 0)
+    {
+        printf("udpRecv_init err\n");
+        return -1;
+    }
+    if (0 > udpOrtp_recv())
+    {
+        printf("udpOrtp_send err\n");
+        return -1;
+    }
+    udpRecv_exit();
+#else
+    //send
+    struct in_addr inp;
+    inp.s_addr = peers[0].host;
+    udpSend_settingInit(inet_ntoa(inp), ntohs(peers[0].host));
+    if (udpSend_init() < 0)
+    {
+        printf("udpSend_init err\n");
+        return -1;
+    }
+    udpOrtp_send();
+    udpSend_exit();
+#endif
     return 0;
 }
