@@ -19,6 +19,7 @@
 
 // This is our server's IP address. In case you're wondering, this one is an RFC 5737 address.
 #define SRV_IP "119.23.42.146"
+// #define SRV_IP "111.230.243.211" 
 
 // A small struct to hold a UDP endpoint. We'll use this to hold each peer's endpoint.
 struct client
