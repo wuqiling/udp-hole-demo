@@ -114,6 +114,7 @@ int udp_punch()
             // endpoint data. We're receiving binary data here, sent using the server's
             // byte ordering. We should make sure we agree on the endianness in any
             // serious code.
+            printf("The datagram came from the server.\n");
             f = 0;
             // Now we just have to add the reported peer into our peer list
             memset((char *)&buf, 0, sizeof(struct client));
@@ -193,6 +194,7 @@ int udp_punch()
         else
         {
             // The datagram came from a peer
+            printf("The datagram came from a peer.\n");
             for (i = 0; i < n; i++)
             {
                 // Identify which peer it came from
@@ -237,6 +239,10 @@ int udp_punch()
 int getMyMappedAddr(int *mappedIp, int *mappedPort)
 {
     struct STUNServer servers[14] = {
+        {"stun.wtfismyip.com", 3478},
+        {"stun.bcs2005.net", 3478},
+        {"numb.viagenie.ca", 3478},
+        {"173.194.202.127", 19302},
         {"stun1.l.google.com", 19302},
         {"stun1.l.google.com", 19305},
         {"stun2.l.google.com", 19302},
@@ -247,10 +253,7 @@ int getMyMappedAddr(int *mappedIp, int *mappedPort)
         {"stun4.l.google.com", 19305},
         {"stun.l.google.com", 19302},
         {"stun.l.google.com", 19305},
-        {"stun.wtfismyip.com", 3478},
-        {"stun.bcs2005.net", 3478},
-        {"numb.viagenie.ca", 3478},
-        {"173.194.202.127", 19302}};
+    };
 
     int Success = 0;
     char *address = malloc(sizeof(char) * 100);
