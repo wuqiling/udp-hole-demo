@@ -175,14 +175,15 @@ int udp_punch()
                     si_other.sin_port = peers[i].port;
                     // Once again, the payload is irrelevant. Feel free to send your VoIP
                     // data in here.
-                    printf("#%2d send data to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
                     if (k == 9)
                     {
+                        printf("#%2d send <ok> to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
                         if (sendto(s, "ok", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
                             diep("sendto()");
                     }
                     else
                     {
+                        printf("#%2d send <hi> to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
                         if (sendto(s, "hi", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
                             diep("sendto()");
                     }
@@ -227,6 +228,7 @@ int udp_punch()
     }
 
     // Actually, we never reach this point...
+    free(recvBuf);
     close(s);
     return 0;
 }
@@ -422,7 +424,7 @@ int main(int argc, char **argv)
     udp_punch();
 
     //step 3
-    //send &recv data over rtp
+    //send & recv data over rtp
     if (argc == 2 && strcmp(argv[1], "recv") == 0)
     {
         //recv
