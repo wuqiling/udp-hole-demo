@@ -210,7 +210,7 @@ int udp_punch()
             {
                 printf("get ok responce !!!\n");
                 endPoint_valid = 1;
-                break; //退出循环准备收发数据
+                // break; //退出循环准备收发数据
             }
 
             // It is possible to get data from an unregistered peer. These are some reasons
@@ -361,6 +361,7 @@ FILE *fp_recv = NULL;
 char fpname_recv[128] = "testRecv.data";
 FILE *fpFormat_recv = NULL;
 char fpFormaName_recv[128] = "testRecvForamt.data";
+
 /**
  * 发送数据到映射的端口
  */
