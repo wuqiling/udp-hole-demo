@@ -23,7 +23,8 @@
 #define PEER_LEN 3
 
 // This is our server's IP address. In case you're wondering, this one is an RFC 5737 address.
-#define SRV_IP "119.23.42.146"
+// #define SRV_IP "119.23.42.146"
+#define SRV_IP "111.230.243.211"
 
 //use for test only
 #define LOCAL_IP "111.230.243.211"
