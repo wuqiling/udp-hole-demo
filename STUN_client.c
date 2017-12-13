@@ -191,7 +191,8 @@ int getPublicIPAddress(struct STUNServer server, char *address, int *port)
 
     request->cookie = htonl(0x2112A442);
 
-    for (int index = 0; index < 3; index++)
+    int index=0;
+    for (index = 0; index < 3; index++)
     {
         srand((unsigned int)time(0));
 
@@ -259,7 +260,8 @@ int getPublicIPAddress(struct STUNServer server, char *address, int *port)
     if (response->type == htons(0x0101))
     {
         // Check the identifer
-        for (int index = 0; index < 3; index++)
+        int index=0;
+        for (index = 0; index < 3; index++)
         {
             if (request->identifier[index] != response->identifier[index])
             {
