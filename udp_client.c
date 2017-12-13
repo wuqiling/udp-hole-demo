@@ -264,7 +264,8 @@ int getMyMappedAddr(int *mappedIp, int *mappedPort)
         return -1;
     }
     int port = 0;
-    for (int index = 0; index < 14 && Success == 0; index++)
+    int index = 0;
+    for (index = 0; index < 14 && Success == 0; index++)
     {
         bzero(address, 100);
         port = 0;
