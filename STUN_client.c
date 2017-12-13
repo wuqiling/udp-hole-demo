@@ -75,7 +75,7 @@ struct STUNXORMappedIPv4Address
 /// @param *port non-null buffer to store the public IPv4 port
 /// @return 0 on success.
 /// @warning This function returns
-///          -1 if failed to bind the socket; 
+///          -1 if failed to bind the socket;
 ///          -2 if failed to resolve the given STUN server;
 ///          -3 if failed to send the STUN request;
 ///          -4 if failed to read from the socket (and timed out; default = 5s);
@@ -191,7 +191,7 @@ int getPublicIPAddress(struct STUNServer server, char *address, int *port)
 
     request->cookie = htonl(0x2112A442);
 
-    int index=0;
+    int index = 0;
     for (index = 0; index < 3; index++)
     {
         srand((unsigned int)time(0));
@@ -224,7 +224,7 @@ int getPublicIPAddress(struct STUNServer server, char *address, int *port)
 
     // Read the response
     char *buffer = (char *)malloc(sizeof(char) * 512);
-    if (buffer==NULL)
+    if (buffer == NULL)
     {
         printf("buffer malloc err\n");
         return -6;
@@ -260,7 +260,7 @@ int getPublicIPAddress(struct STUNServer server, char *address, int *port)
     if (response->type == htons(0x0101))
     {
         // Check the identifer
-        int index=0;
+        int index = 0;
         for (index = 0; index < 3; index++)
         {
             if (request->identifier[index] != response->identifier[index])

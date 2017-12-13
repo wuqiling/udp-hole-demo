@@ -211,7 +211,7 @@ int udp_punch()
             {
                 printf("get ok responce !!!\n");
                 endPoint_valid = 1;
-                // break; //退出循环准备收发数据
+                break; //退出循环准备收发数据
             }
 
             // It is possible to get data from an unregistered peer. These are some reasons
