@@ -312,9 +312,9 @@ int getMyMappedAddr(int *mappedIp, int *mappedPort)
 }
 
 FILE *fp = NULL;
-char fpname[128] = "testSend.data";
+char fpname[128] = "./testSend.data";
 FILE *fpFormat = NULL;
-char fpFormaName[128] = "testSendForamt.data";
+char fpFormaName[128] = "./testSendForamt.data";
 /**
  * 发送数据到映射的端口
  */
@@ -340,11 +340,7 @@ static int udpOrtp_send()
     }
     while (1)
     {
-        if (0 == fscanf(fpFormat, "%d", &len))
-        {
-            printf("read end or err\n");
-            break;
-        }
+        fscanf(fpFormat, "%d", &len);
         memset(buf, 0, bufsize);
         if (len > bufsize || len != fread(buf, 1, len, fp)) //读取编码的声音
         {
@@ -359,6 +355,7 @@ static int udpOrtp_send()
             free(buf);
             return -1;
         }
+        printf("send len %5d\n", len);
     }
     fclose(fp);
     fclose(fpFormat);
