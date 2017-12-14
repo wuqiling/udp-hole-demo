@@ -477,7 +477,7 @@ int main(int argc, char **argv)
             inp.s_addr = peers[0].host;
             port_tmp = peers[0].host;
         }
-
+        printf("ortp send to dst %s:%d\n", inet_ntoa(inp), ntohs(port_tmp));
         udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp));
         if (udpSend_init() < 0)
         {
