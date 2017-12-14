@@ -445,8 +445,8 @@ int main(int argc, char **argv)
     {
         //recv
         printf("step 3. recv data over rtp\n");
-        printf("ortp recv data on local port %d\n", ntohs(mappedPort));
-        udpRecv_settingInit("0.0.0.0", ntohs(mappedPort));
+        printf("ortp recv data on local port %d\n", mappedPort);
+        udpRecv_settingInit("0.0.0.0", mappedPort);
         if (udpRecv_init() < 0)
         {
             printf("udpRecv_init err\n");
@@ -475,8 +475,8 @@ int main(int argc, char **argv)
             inp.s_addr = peers[0].host;
             port_tmp = peers[0].port;
         }
-        printf("ortp send to dst %s:%d from local port %d\n", inet_ntoa(inp), ntohs(port_tmp), ntohs(mappedPort));
-        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp), ntohs(mappedPort));
+        printf("ortp send to dst %s:%d from local port %d\n", inet_ntoa(inp), ntohs(port_tmp), mappedPort);
+        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp), mappedPort);
         if (udpSend_init() < 0)
         {
             printf("udpSend_init err\n");
