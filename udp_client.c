@@ -48,6 +48,7 @@ void diep(char *s)
 static volatile int endPoint_valid = 0;
 static volatile int mappedIp = 0;
 static volatile int mappedPort = 0;
+static volatile int pointCnt = 0;
 
 //udp punch
 static struct client peers[PEER_LEN]; // 10 peers. Notice that we're not doing any bound checking.
@@ -144,6 +145,7 @@ int udp_punch()
                     peers[n].host = buf.host;
                     peers[n].port = buf.port;
                     n++;
+                    pointCnt++;
 
                     si_other.sin_addr.s_addr = buf.host;
                     si_other.sin_port = buf.port;
@@ -463,8 +465,19 @@ int main(int argc, char **argv)
         //send
         printf("step 3. send data over rtp\n");
         struct in_addr inp;
-        inp.s_addr = peers[0].host;
-        udpSend_settingInit(inet_ntoa(inp), ntohs(peers[0].host));
+        int port_tmp;
+        if (peers[0].host == mappedIp && pointCnt > 1)
+        {
+            inp.s_addr = peers[1].host;
+            port_tmp = peers[1].host;
+        }
+        else if (peers[0].host != mappedIp)
+        {
+            inp.s_addr = peers[0].host;
+            port_tmp = peers[0].host;
+        }
+
+        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp));
         if (udpSend_init() < 0)
         {
             printf("udpSend_init err\n");
