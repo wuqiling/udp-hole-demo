@@ -186,6 +186,7 @@ int udp_punch()
                         printf("#%2d send <ok> to %s:%d\n", k, inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
                         if (sendto(s, "ok", 2, 0, (struct sockaddr *)(&si_other), slen) == -1)
                             diep("sendto()");
+                        usleep(10);
                     }
                     else
                     {
@@ -354,7 +355,7 @@ static int udpOrtp_send()
             free(buf);
             return -1;
         }
-        printf("send len %5d\n", len);
+        printf("send len %5d + \n", len);
         usleep(10);
     }
     fclose(fp);
