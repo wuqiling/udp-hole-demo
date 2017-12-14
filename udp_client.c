@@ -140,6 +140,8 @@ int udp_punch()
                         struct in_addr inp;
                         inp.s_addr = buf.host;
                         printf("udp get own ip %s:%d\n", inet_ntoa(inp), ntohs(buf.port));
+                        mappedPort = ntohs(buf.port); //update mapped port !!! , so client must work in two nat
+
                         // continue;
                     }
                     peers[n].host = buf.host;
@@ -199,6 +201,7 @@ int udp_punch()
         {
             // The datagram came from a peer
             printf("\nThe datagram came from a peer.\n");
+            endPoint_valid = 1;
             for (i = 0; i < n; i++)
             {
                 // Identify which peer it came from
@@ -209,17 +212,15 @@ int udp_punch()
                     printf("Received from peer %d!\n", i);
                     break;
                 }
+                if (mappedIp == si_other.sin_addr.s_addr && mappedPort == (short)(si_other.sin_port))
+                {
+                    endPoint_valid = 0;
+                }
             }
 
             if (recvBuf[0] == 'o' && recvBuf[1] == 'k')
             {
-                printf("get ok responce !!!\n");
-                endPoint_valid = 1;
-                if (mappedIp == si_other.sin_addr.s_addr)
-                {
-                    printf("get ok from my own\n");
-                }
-                else
+                if (endPoint_valid)
                 {
                     printf("get ok from other\n");
                     break; //退出循环准备收发数据
