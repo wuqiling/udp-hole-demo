@@ -34,7 +34,7 @@ int udpSend_settingInit(char *dstIp, int dstPort, int localPort)
     sender.audioSession = NULL;
     sender.audio_ts = 0;
     sender.rtpAudioType = 34;
-    sender.maxPacketSize = 1010;
+    sender.maxPacketSize = 1100;
 
     strcpy(sender.rtpRemoteIp, dstIp);
     sender.rtpAudioPort = dstPort;
