@@ -470,12 +470,12 @@ int main(int argc, char **argv)
         if (peers[0].host == mappedIp && pointCnt > 1)
         {
             inp.s_addr = peers[1].host;
-            port_tmp = peers[1].host;
+            port_tmp = peers[1].port;
         }
         else if (peers[0].host != mappedIp)
         {
             inp.s_addr = peers[0].host;
-            port_tmp = peers[0].host;
+            port_tmp = peers[0].port;
         }
         printf("ortp send to dst %s:%d\n", inet_ntoa(inp), ntohs(port_tmp));
         udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp));
