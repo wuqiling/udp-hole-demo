@@ -355,7 +355,7 @@ static int udpOrtp_send()
             free(buf);
             return -1;
         }
-        printf("send len %5d + \n", len);
+        printf("send len %5d + ", len);
         usleep(10);
     }
     fclose(fp);
@@ -437,6 +437,7 @@ int main(int argc, char **argv)
 
     //step 2
     //使用 udp + 外网 主机 获得要通信的远端主机 映射ip
+    //TODO: add some name info for hole punch
     printf("step 2. 使用 udp + 外网 主机 获得要通信的远端主机 映射ip\n");
     udp_punch();
 
