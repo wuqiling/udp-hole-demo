@@ -127,7 +127,7 @@ int udpRecv_recv(void *recvBuf, int *recvLen)
             {
                 printf("udpRecv_recv audio waiting ...\n");
             }
-            if (waitCnt > 10000)
+            if (waitCnt > 1000)
             {
                 printf("udpRecv_recv audio waiting too long, exit\n");
                 return -1;

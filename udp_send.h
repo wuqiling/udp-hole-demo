@@ -5,7 +5,7 @@
  * setting init
  * input mapped ip and port
  */
-int udpSend_settingInit(char *dstIp, int dstPort);
+int udpSend_settingInit(char *dstIp, int dstPort, int localPort);
 
 /**
  * init send

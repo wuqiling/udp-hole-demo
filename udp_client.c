@@ -141,7 +141,6 @@ int udp_punch()
                         inp.s_addr = buf.host;
                         printf("udp get own ip %s:%d\n", inet_ntoa(inp), ntohs(buf.port));
                         mappedPort = ntohs(buf.port); //update mapped port !!! , so client must work in two nat
-
                         // continue;
                     }
                     peers[n].host = buf.host;
@@ -356,6 +355,7 @@ static int udpOrtp_send()
             return -1;
         }
         printf("send len %5d\n", len);
+        usleep(10);
     }
     fclose(fp);
     fclose(fpFormat);
@@ -475,7 +475,7 @@ int main(int argc, char **argv)
             port_tmp = peers[0].port;
         }
         printf("ortp send to dst %s:%d\n", inet_ntoa(inp), ntohs(port_tmp));
-        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp));
+        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp), ntohs(mappedPort));
         if (udpSend_init() < 0)
         {
             printf("udpSend_init err\n");

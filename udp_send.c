@@ -28,7 +28,7 @@ static t_udp_send sender;
  * setting init
  * input mapped ip and port
  */
-int udpSend_settingInit(char *dstIp, int dstPort)
+int udpSend_settingInit(char *dstIp, int dstPort, int localPort)
 {
     memset(&sender, 0, sizeof(t_udp_send));
     sender.audioSession = NULL;
@@ -38,7 +38,7 @@ int udpSend_settingInit(char *dstIp, int dstPort)
 
     strcpy(sender.rtpRemoteIp, dstIp);
     sender.rtpAudioPort = dstPort;
-    sender.rtpAudioLocalPort = 3030;
+    sender.rtpAudioLocalPort = localPort;
     return 0;
 }
 
