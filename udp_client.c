@@ -21,6 +21,7 @@
 #define NPACK 10
 #define PORT 3030
 #define PEER_LEN 3
+#define UDP_PUNCH_RECV_BUFF (10 << 10)
 
 // This is our server's IP address. In case you're wondering, this one is an RFC 5737 address.
 // #define SRV_IP "119.23.42.146"
@@ -79,7 +80,6 @@ int udp_punch()
     server.host = si_other.sin_addr.s_addr;
     server.port = si_other.sin_port;
 
-#define UDP_PUNCH_RECV_BUFF (10 << 10)
     char *recvBuf = (char *)malloc(sizeof(char) * UDP_PUNCH_RECV_BUFF);
     if (recvBuf == NULL)
     {
@@ -108,6 +108,7 @@ int udp_punch()
         if ((ret = recvfrom(s, recvBuf, UDP_PUNCH_RECV_BUFF, 0, (struct sockaddr *)(&si_other), &slen)) == -1)
             diep("recvfrom");
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
+
         if (server.host == si_other.sin_addr.s_addr && server.port == (short)(si_other.sin_port))
         {
             // The datagram came from the server. The server code is set to send us a
@@ -199,7 +200,8 @@ int udp_punch()
             for (i = 0; i < n; i++)
             {
                 // Identify which peer it came from
-                if (peers[i].host == buf.host && peers[i].port == (short)(buf.port))
+                // if (peers[i].host == buf.host && peers[i].port == (short)(buf.port))
+                if (peers[i].host == si_other.sin_addr.s_addr && peers[i].port == (short)(si_other.sin_port))
                 {
                     // And do something useful with the received payload
                     printf("Received from peer %d!\n", i);
