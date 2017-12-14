@@ -201,7 +201,6 @@ int udp_punch()
         {
             // The datagram came from a peer
             printf("\nThe datagram came from a peer.\n");
-            endPoint_valid = 1;
             for (i = 0; i < n; i++)
             {
                 // Identify which peer it came from
@@ -212,12 +211,13 @@ int udp_punch()
                     printf("Received from peer %d!\n", i);
                     break;
                 }
-                if (mappedIp == si_other.sin_addr.s_addr && mappedPort == (short)(si_other.sin_port))
-                {
-                    endPoint_valid = 0;
-                }
             }
-
+            endPoint_valid = 1;
+            if (mappedIp == si_other.sin_addr.s_addr)
+            {
+                endPoint_valid = 0;
+                printf("The datagram came from myself\n");
+            }
             if (recvBuf[0] == 'o' && recvBuf[1] == 'k')
             {
                 if (endPoint_valid)
