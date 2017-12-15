@@ -115,7 +115,7 @@ int udp_punch()
         // doing), so remember to do some kind of validation in here.
         memset(recvBuf, 0, UDP_PUNCH_RECV_BUFF);
         int ret = 0;
-        if ((ret = recvfrom(s, recvBuf, UDP_PUNCH_RECV_BUFF, 0, (struct sockaddr *)(&si_other), &slen)) == -1)
+        if ((ret = recvfrom(s, recvBuf, UDP_PUNCH_RECV_BUFF, 0, (struct sockaddr *)(&si_other), (socklen_t *)&slen)) == -1)
             diep("recvfrom");
         printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 
@@ -456,8 +456,8 @@ int main(int argc, char **argv)
     {
         //recv
         printf("step 3. recv data over rtp\n");
-        printf("ortp recv data on local port %d\n", mappedPort);
-        udpRecv_settingInit("0.0.0.0", mappedPort);
+        printf("ortp recv data on local port %d\n", 3030);
+        udpRecv_settingInit("0.0.0.0", 3030);
         if (udpRecv_init() < 0)
         {
             printf("udpRecv_init err\n");
