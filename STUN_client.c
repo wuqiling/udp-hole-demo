@@ -19,7 +19,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#define LOCAL_PORT 3030
+#define LOCAL_PORT 0
 int local_port = LOCAL_PORT;
 
 // MARK: === PRIVATE DATA STRUCTURE ===

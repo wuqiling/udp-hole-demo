@@ -59,10 +59,15 @@ int udp_punch()
     int s, i, f, j, k, slen = sizeof(si_other);
     struct client buf;
     struct client server;
-    int n = 0;
+    int n = 0, flag = 1, len = sizeof(int);
 
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
         diep("socket");
+
+    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &flag, len) == -1)
+    {
+        diep("setsockopt");
+    }
 
     // Our own endpoint data
     memset((char *)&si_me, 0, sizeof(si_me));
