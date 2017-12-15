@@ -356,7 +356,7 @@ static int udpOrtp_send()
             printf("read end or err\n");
             break;
         }
-        if (0 > udpSend_send(buf, len))
+        if (udpSend_send(buf, len) < 0)
         {
             printf("rtp_sendAudio err\n");
             fclose(fp);
@@ -365,7 +365,7 @@ static int udpOrtp_send()
             return -1;
         }
         printf("send len %5d + ", len);
-        usleep(10);
+        usleep(50);
     }
     fclose(fp);
     fclose(fpFormat);
@@ -486,8 +486,8 @@ int main(int argc, char **argv)
             inp.s_addr = peers[0].host;
             port_tmp = peers[0].port;
         }
-        printf("ortp send to dst %s:%d from local port %d\n", inet_ntoa(inp), ntohs(port_tmp), mappedPort);
-        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp), mappedPort);
+        printf("ortp send to dst %s:%d from local port %d\n", inet_ntoa(inp), ntohs(port_tmp), 3030);
+        udpSend_settingInit(inet_ntoa(inp), ntohs(port_tmp), 3030);
         if (udpSend_init() < 0)
         {
             printf("udpSend_init err\n");

@@ -18,7 +18,7 @@ typedef struct
     int rtpAudioPort;         //目的音频端口
     int rtpAudioLocalPort;    //local audio port
     int rtpAudioType;         //音频编码格式
-    unsigned long audio_ts;   //时间戳
+    volatile unsigned long audio_ts;   //时间戳
     int maxPacketSize;
 } t_udp_recv;
 
