@@ -1,5 +1,5 @@
 #ifndef _UDP_SEND_H
-#define _UDP_SEND_H 
+#define _UDP_SEND_H
 
 /**
  * setting init

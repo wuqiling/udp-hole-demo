@@ -9,22 +9,37 @@ for a higher success rate.
 
 
 v0.0.1
-add function of stun
-add function of ortp-send
-add function of ortp-recv
 
-build:
-make clean && make
+#1 add function of stun
+
+#2 add function of ortp-send
+
+#3 add function of ortp-recv
+
+test pass on ubuntu 16.04 x64
+
+
+dependent:
+ortp-0.23.0
+
+build(only in linux now)
+
+    make clean && make
 
 usage:
 
 server(must run in public ip)
-     ./serverDemo.o
+
+    ./serverDemo.o
+
 
 client(must run in diffrent nat now, this will be fixed)
-    recv data
+
+recv data
+
     ./clientDemo.o recv
     
-    send data
+send data
+
     ./clientDemo.o
 

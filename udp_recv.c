@@ -13,12 +13,12 @@
 
 typedef struct
 {
-    RtpSession *audioSession; //ortp 音频会话
-    char rtpRemoteIp[20];     //目的Ip
-    int rtpAudioPort;         //目的音频端口
-    int rtpAudioLocalPort;    //local audio port
-    int rtpAudioType;         //音频编码格式
-    volatile unsigned long audio_ts;   //时间戳
+    RtpSession *audioSession;        //ortp 音频会话
+    char rtpRemoteIp[20];            //目的Ip
+    int rtpAudioPort;                //目的音频端口
+    int rtpAudioLocalPort;           //local audio port
+    int rtpAudioType;                //音频编码格式
+    volatile unsigned long audio_ts; //时间戳
     int maxPacketSize;
 } t_udp_recv;
 
