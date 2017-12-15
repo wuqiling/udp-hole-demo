@@ -64,16 +64,20 @@ int udp_punch()
     if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
         diep("socket");
 
-    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &flag, len) == -1)
-    {
-        diep("setsockopt");
-    }
+    // if (setsockopt(s, SOL_SOCKET, SO_REUSEPORT, &flag, len) == -1)
+    // {
+    //     diep("setsockopt");
+    // }
 
     // Our own endpoint data
     memset((char *)&si_me, 0, sizeof(si_me));
     si_me.sin_family = AF_INET;
     si_me.sin_port = htons(PORT); // This is not really necessary, we can also use 0 (any port)
     si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+    if (-1 == bind(s, (struct sockaddr *)&si_me, sizeof(struct sockaddr_in)))
+    {
+        diep("bind");
+    }
 
     // The server's endpoint data
     memset((char *)&si_other, 0, sizeof(si_other));
