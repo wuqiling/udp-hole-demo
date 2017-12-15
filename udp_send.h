@@ -15,7 +15,12 @@ int udpSend_init();
 /**
  * exit send
  */
-int udpSend_exit();
+int udpSend_exit(void);
+
+/**increase ts
+ * use ts to indicate new frame data
+ */
+int udpSend_updateTS(void);
 
 /**
  * send process

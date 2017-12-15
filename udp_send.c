@@ -13,12 +13,12 @@
 
 typedef struct
 {
-    RtpSession *audioSession; //ortp 音频会话
-    char rtpRemoteIp[20];     //目的Ip
-    int rtpAudioPort;         //目的音频端口
-    int rtpAudioLocalPort;    //local audio port
-    int rtpAudioType;         //音频编码格式
-    volatile unsigned long audio_ts;   //时间戳
+    RtpSession *audioSession;        //ortp 音频会话
+    char rtpRemoteIp[20];            //目的Ip
+    int rtpAudioPort;                //目的音频端口
+    int rtpAudioLocalPort;           //local audio port
+    int rtpAudioType;                //音频编码格式
+    volatile unsigned long audio_ts; //时间戳
     int maxPacketSize;
 } t_udp_send;
 
@@ -76,7 +76,7 @@ int udpSend_init()
 /**
  * exit send
  */
-int udpSend_exit()
+int udpSend_exit(void)
 {
     if (sender.audioSession != NULL)
     {
@@ -86,6 +86,15 @@ int udpSend_exit()
 
     ortp_exit();
     ortp_global_stats_display();
+    return 0;
+}
+
+/**increase ts
+ * use ts to indicate new frame data
+ */
+int udpSend_updateTS(void)
+{
+    sender.audio_ts += RTP_TS_INC;
     return 0;
 }
 
@@ -112,6 +121,5 @@ int udpSend_send(void *sendBuf, int sendLen)
         pos += sender.maxPacketSize;
         usleep(20);
     }
-    sender.audio_ts += RTP_TS_INC;
     return 0;
 }

@@ -356,6 +356,7 @@ static int udpOrtp_send()
             printf("read end or err\n");
             break;
         }
+        udpSend_updateTS();
         if (udpSend_send(buf, len) < 0)
         {
             printf("rtp_sendAudio err\n");
@@ -365,7 +366,7 @@ static int udpOrtp_send()
             return -1;
         }
         printf("send len %5d + ", len);
-        usleep(50);
+        usleep(30000); //sleep for 30ms
     }
     fclose(fp);
     fclose(fpFormat);
