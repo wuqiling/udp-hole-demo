@@ -15,7 +15,7 @@
 
 #include "udp_send.h"
 #include "udp_recv.h"
-#include "STUN_client.h"
+#include "STUNExternalIP.h"
 
 #define BUFLEN 512
 #define NPACK 10
@@ -28,7 +28,7 @@
 #define SRV_IP "111.230.243.211"
 
 //use for test only
-#define LOCAL_IP "111.230.243.211"
+// #define LOCAL_IP "111.230.243.211"
 
 // A small struct to hold a UDP endpoint. We'll use this to hold each peer's endpoint.
 struct client

@@ -8,7 +8,7 @@
 //  Copyright © 2016-2017 FireWolf. All rights reserved.
 //
 
-#include "STUN_client.h"
+#include "STUNExternalIP.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

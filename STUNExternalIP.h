@@ -7,8 +7,8 @@
 //
 //  Copyright © 2017 FireWolf. All rights reserved.
 //
-#ifndef _STUN_CLIENT_H
-#define _STUN_CLIENT_H
+#ifndef _STUNEXTERNALIP_H
+#define _STUNEXTERNALIP_H
 
 struct STUNServer
 {
