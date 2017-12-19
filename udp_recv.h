@@ -1,5 +1,5 @@
 #ifndef _UDP_RECV_H
-#define _UDP_RECV_H 
+#define _UDP_RECV_H
 
 /**
  * setting init
@@ -12,8 +12,10 @@ int udpRecv_settingInit(char *recvIp, int recvPort);
  */
 int udpRecv_init();
 
-// 退出ortp
-//根据 ortp 0.23.0 src/test/rtprecv.c 编写
+/**
+ * 退出ortp
+ * 根据 ortp 0.23.0 src/test/rtprecv.c 编写
+ */
 int udpRecv_exit(void);
 
 /**

@@ -17,7 +17,8 @@ int udpSend_init();
  */
 int udpSend_exit(void);
 
-/**increase ts
+/**
+ * increase ts
  * use ts to indicate new frame data
  */
 int udpSend_updateTS(void);

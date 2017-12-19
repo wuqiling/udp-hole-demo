@@ -36,4 +36,4 @@ int getPublicIPAddress(struct STUNServer server, char *address, int *port);
 
 
 
-#endif // !_STUN_CLIENT_H
+#endif // !_STUNEXTERNALIP_H
